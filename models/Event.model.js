@@ -1,19 +1,38 @@
 const { Schema, model } = require("mongoose");
 
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
-const userSchema = new Schema(
+const eventSchema = new Schema(
 	{
-		email: {
+		title: {
 			type: String,
-			required: [true, "Email is required."],
-			unique: true,
-			lowercase: true,
+			required: [true, "Title is required."],
 			trim: true,
 		},
-		password: {
+		description: {
 			type: String,
-			required: [true, "Password is required."],
+			required: [true, "Description is required."],
 		},
+		date: {
+			type: Date,
+			default: Date.now,
+		},
+		location: {
+			type: [String],
+			enum: [
+				"Edoras",
+				"Fangorn",
+				"Gondor",
+				"Isengard",
+				"Minas Tirith",
+				"Mordor",
+				"Moria",
+				"Rivendell",
+				"Rohan",
+				"The Shire",
+			],
+		},
+		userId: [{ type: Schema.Types.ObjectId, ref: "User" }],
+		comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 	},
 	{
 		// this second object adds extra properties: `createdAt` and `updatedAt`
@@ -21,6 +40,6 @@ const userSchema = new Schema(
 	}
 );
 
-const User = model("User", userSchema);
+const Event = model("Event", eventSchema);
 
-module.exports = User;
+module.exports = Event;

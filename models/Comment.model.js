@@ -1,18 +1,16 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, SchemaType } = require("mongoose");
 
 // TODO: Please make sure you edit the User model to whatever makes sense in this case
-const userSchema = new Schema(
+const commentSchema = new Schema(
 	{
-		email: {
+		text: {
 			type: String,
-			required: [true, "Email is required."],
-			unique: true,
-			lowercase: true,
+			required: [true, "Text is required."],
 			trim: true,
 		},
-		password: {
-			type: String,
-			required: [true, "Password is required."],
+		event: {
+			type: Schema.Types.ObjectId,
+			ref: "Event",
 		},
 	},
 	{
@@ -21,6 +19,6 @@ const userSchema = new Schema(
 	}
 );
 
-const User = model("User", userSchema);
+const Comment = model("Comment", commentSchema);
 
-module.exports = User;
+module.exports = Comment;
