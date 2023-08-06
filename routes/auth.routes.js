@@ -25,26 +25,43 @@ router.post("/signup", async (req, res) => {
 /* POST route to login */
 router.post("/login", async (req, res) => {
 	const payload = req.body;
-	/* Check if user exists */
-	const potentialUser = await User.findOne({ username: payload.username });
-	if (potentialUser) {
-		if (bcrypt.compareSync(payload.password, potentialUser.password)) {
-			/* Sign the JWT */
-			const authToken = jwt.sign(
-				{ userId: potentialUser._id },
-				process.env.TOKEN_SECRET,
-				{ algorithm: "H256", expiresIn: "6h" }
-			);
-			/* Sending back token to the front */
-			res.status(202).json({ token: authToken });
+	try {
+		/* Check if user exists */
+		const potentialUser = await User.findOne({ username: payload.username });
+		if (potentialUser) {
+			if (bcrypt.compareSync(payload.password, potentialUser.password)) {
+				/* Sign the JWT */
+				const authToken = jwt.sign(
+					{ userId: potentialUser._id },
+					process.env.TOKEN_SECRET,
+					{ algorithm: "H256", expiresIn: "6h" }
+				);
+				/* Sending back token to the front */
+				res.status(202).json({ token: authToken });
+			} else {
+				/* Incorrect pasword */
+				res.status(403).json({ errorMessage: "Password invalid" });
+			}
 		} else {
-			/* Incorrect pasword */
-			res.status(403).json({ errorMessage: "Password invalid" });
+			/* No user found */
+			res.status(403).json({ errorMessage: "No user found" });
 		}
-	} else {
-		/* No user found */
-		res.status(403).json({ errorMessage: "No user found" });
+	} catch (error) {
+		console.log("Error on POST login: ", error);
 	}
 });
 
 /* GET route to verify token */
+router.get("/verify", isAuthenticated, async (req, res) => {
+	console.log("After the middleware, JWT outputs: ", req.payload);
+	try {
+		const currentUser = await User.findById(req.payload.userId);
+		/* Never send password to front end */
+		currentUser.password = "*****";
+		res.status(200).json({ message: "Token is valid", currentUser });
+	} catch (error) {
+		console.log("Error on GET verify: ", error);
+	}
+});
+
+module.exports = router;
