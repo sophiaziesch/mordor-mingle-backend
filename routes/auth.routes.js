@@ -9,12 +9,17 @@ router.get("/", (req, res, next) => {
 });
 
 /* POST route to signup */
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res, next) => {
 	const payload = req.body;
+	console.log(payload);
 	const salt = bcrypt.genSaltSync(13);
 	const passwordHash = bcrypt.hashSync(payload.password, salt);
 	try {
-		await User.create({ username: payload.username, password: passwordHash });
+		await User.create({
+			username: payload.username,
+			email: payload.email,
+			password: passwordHash,
+		});
 		res.status(201).json({ message: "User created" });
 	} catch (error) {
 		console.log("Error on POST signup: ", error);
@@ -23,11 +28,13 @@ router.post("/signup", async (req, res) => {
 });
 
 /* POST route to login */
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
 	const payload = req.body;
+	console.log(payload);
 	try {
 		/* Check if user exists */
 		const potentialUser = await User.findOne({ username: payload.username });
+		console.log(potentialUser);
 		if (potentialUser) {
 			if (bcrypt.compareSync(payload.password, potentialUser.password)) {
 				/* Sign the JWT */
@@ -48,12 +55,12 @@ router.post("/login", async (req, res) => {
 		}
 	} catch (error) {
 		console.log("Error on POST login: ", error);
+		res.status(500).json.error;
 	}
 });
 
 /* GET route to verify token */
-router.get("/verify", isAuthenticated, async (req, res) => {
-	console.log("After the middleware, JWT outputs: ", req.payload);
+router.get("/verify", isAuthenticated, async (req, res, next) => {
 	try {
 		const currentUser = await User.findById(req.payload.userId);
 		/* Never send password to front end */
