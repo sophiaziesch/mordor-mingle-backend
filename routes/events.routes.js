@@ -1,6 +1,10 @@
 const Event = require("../models/Event.model");
 const router = require("express").Router();
 
+router.get("/", (req, res, next) => {
+	res.json("All good in events");
+});
+
 /* GET all events (read) */
 router.get("/", async (req, res) => {
 	try {
