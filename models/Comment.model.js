@@ -11,6 +11,7 @@ const commentSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "Event",
 		},
+		userId: [{ type: Schema.Types.ObjectId, ref: "User" }],
 	},
 	{
 		// this second object adds extra properties: `createdAt` and `updatedAt`

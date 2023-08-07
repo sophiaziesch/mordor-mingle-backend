@@ -14,6 +14,7 @@ const eventSchema = new Schema(
 		date: {
 			type: Date,
 			default: Date.now,
+			required: [true, "Date is required."],
 		},
 		location: {
 			type: [String],
