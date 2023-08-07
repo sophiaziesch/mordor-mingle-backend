@@ -1,4 +1,5 @@
 const Event = require("../models/Event.model");
+const Comment = require("../models/Comment.model");
 const router = require("express").Router();
 
 router.get("/", (req, res, next) => {
@@ -58,10 +59,46 @@ router.put("/:eventId"),
 /* DELETE one event (delete) */
 router.delete("/:eventId", async (req, res) => {
 	try {
-		await Event.findByIdAndDelete(req.params.studentId);
+		await Event.findByIdAndDelete(req.params.eventId);
 		res.status(202).json({ message: "Event deleted" });
 	} catch (error) {
 		console.log("Error on DELETE one student: ", error);
+		res.status(500).json(error);
+	}
+});
+
+/* COMMENTS ROUTES */
+/* GET all comments */
+router.get("/:eventId/comments", async (req, res) => {
+	try {
+		const eventId = req.params.eventId;
+		const comments = await Comment.find({ event: eventId });
+		res.status(200).json(comments);
+	} catch (error) {
+		console.log("Error on GET all comments: ", error);
+		res.status(500).json(error);
+	}
+});
+
+/* POST new comment */
+router.post("/:eventId/comments", async (req, res) => {
+	try {
+		const payload = req.body;
+		const newComment = await Comment.create(payload);
+		await newComment.populate("userId").execPopulate();
+	} catch (error) {
+		console.log("Error on POST one comment: ", error);
+		res.status(500).json(error);
+	}
+});
+
+/* DELETE comment */
+router.delete("/:eventId/comments/:commentId", async (req, res) => {
+	try {
+		await Comment.findByIdAndDelete(req.params.commentId);
+		res.status(202).json({ message: "Event deleted" });
+	} catch (error) {
+		console.log("Error on DELETE one event: ", error);
 		res.status(500).json(error);
 	}
 });
