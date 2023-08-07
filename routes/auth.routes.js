@@ -1,7 +1,8 @@
 const router = require("express").Router();
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User.model");
-const jwt = require("jsonwebtoken");
+
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 router.get("/", (req, res, next) => {
@@ -41,7 +42,7 @@ router.post("/login", async (req, res, next) => {
 				const authToken = jwt.sign(
 					{ userId: potentialUser._id },
 					process.env.TOKEN_SECRET,
-					{ algorithm: "H256", expiresIn: "6h" }
+					{ algorithm: "HS256", expiresIn: "6h" }
 				);
 				/* Sending back token to the front */
 				res.status(202).json({ token: authToken });
