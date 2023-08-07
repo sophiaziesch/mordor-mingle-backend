@@ -83,9 +83,14 @@ router.get("/:eventId/comments", async (req, res) => {
 /* POST new comment */
 router.post("/:eventId/comments", async (req, res) => {
 	try {
+		const eventId = req.params.eventId;
 		const payload = req.body;
+		payload.event = eventId;
+
 		const newComment = await Comment.create(payload);
 		await newComment.populate("userId").execPopulate();
+
+		res.status(201).json(newComment);
 	} catch (error) {
 		console.log("Error on POST one comment: ", error);
 		res.status(500).json(error);
