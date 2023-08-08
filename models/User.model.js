@@ -21,7 +21,7 @@ const userSchema = new Schema(
 		},
 		eventsCreated: [{ type: Schema.Types.ObjectId, ref: "Event" }],
 		eventsLiked: [{ type: Schema.Types.ObjectId, ref: "Event" }],
-		image: String,
+		profileImage: String,
 		race: {
 			type: [String],
 			enum: [
