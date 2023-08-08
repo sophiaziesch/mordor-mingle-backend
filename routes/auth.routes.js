@@ -72,4 +72,34 @@ router.get("/verify", isAuthenticated, async (req, res, next) => {
 	}
 });
 
+/* GET one user route */
+
+router.get("/:userId", async (req, res) => {
+	try {
+		const userId = req.params.userId;
+		const user = await User.findById(userId)
+			.populate('eventsCreated')
+			.populate('eventsLiked');
+
+		res.status(200).json(user);
+	} catch (error) {
+		console.log("Error on GET on event: ", error);
+		res.status(500).json(error);
+	}
+});
+
+/* update user info (PUT) */
+router.put("/:userId", async (req, res) => {
+		try {
+			const userId = req.params.userId;
+			const payload = req.body;
+			const updatedUser = await User.findByIdAndUpdate(userId, payload, { 
+			new: true });
+		res.status(202).json(updatedUser);
+		} catch (error) {
+			console.log("Error updating user info: ", error);
+			res.status(500).json(error);
+		} 
+	});
+
 module.exports = router;
