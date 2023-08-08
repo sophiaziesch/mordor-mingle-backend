@@ -76,7 +76,7 @@ router.get("/verify", isAuthenticated, async (req, res, next) => {
 
 router.get("/:userId", async (req, res) => {
 	try {
-		const user = await User.findById(req.params.userId);
+		const user = await User.findById(req.params.userId).populate('eventsCreated');
 		res.status(200).json(user);
 	} catch (error) {
 		console.log("Error on GET on event: ", error);
