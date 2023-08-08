@@ -1,10 +1,13 @@
 const Event = require("../models/Event.model");
 const Comment = require("../models/Comment.model");
 const router = require("express").Router();
+const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const User = require("../models/User.model");
 
-router.get("/", (req, res, next) => {
-	res.json("All good in events");
-});
+// router.get("/", (req, res, next) => {
+// 	res.json("All good in events");
+// });
+//MY FUCKING GOD I SPENT TWO HOURS ON THIS SHITTTTTTTTT
 
 /* GET all events (read) */
 router.get("/", async (req, res) => {
@@ -20,7 +23,11 @@ router.get("/", async (req, res) => {
 /* GET one event (read) */
 router.get("/:eventId", async (req, res) => {
 	try {
-		const event = await Event.findById(req.params.eventId);
+		const event = await Event.findById(req.params.eventId).populate("comments");
+		console.log(event);
+		if (!event) {
+			return res.status(404).json({ message: "Event not found" });
+		}
 		res.status(200).json(event);
 	} catch (error) {
 		console.log("Error on GET on event: ", error);
@@ -32,7 +39,17 @@ router.get("/:eventId", async (req, res) => {
 router.post("/", async (req, res) => {
 	try {
 		const payload = req.body;
-		const newEvent = await Event.create(payload);
+		const userId = req.payload.userId;
+		console.log("POST event payload: ", payload);
+		const newEvent = await Event.create({
+			title: payload.title,
+			description: payload.description,
+			date: payload.date,
+			location: payload.location,
+			userId: userId,
+		});
+		res.status(201).json(newEvent);
+		//console.log(newEvent);
 	} catch (error) {
 		console.log("Error on POST one event: ", error);
 		res.status(500).json(error);
@@ -62,7 +79,7 @@ router.delete("/:eventId", async (req, res) => {
 		await Event.findByIdAndDelete(req.params.eventId);
 		res.status(202).json({ message: "Event deleted" });
 	} catch (error) {
-		console.log("Error on DELETE one student: ", error);
+		console.log("Error on DELETE one event: ", error);
 		res.status(500).json(error);
 	}
 });
@@ -81,15 +98,20 @@ router.get("/:eventId/comments", async (req, res) => {
 });
 
 /* POST new comment */
-router.post("/:eventId/comments", async (req, res) => {
+router.post("/:eventId", isAuthenticated, async (req, res) => {
 	try {
 		const eventId = req.params.eventId;
 		const payload = req.body;
-		payload.event = eventId;
-
-		const newComment = await Comment.create(payload);
-		await newComment.populate("userId").execPopulate();
-
+		const userId = req.payload.userId;
+		console.log(payload);
+		const newComment = await Comment.create({
+			text: payload.text,
+			event: eventId,
+			userId,
+		});
+		const updatedEvent = await Event.findByIdAndUpdate(eventId, {
+			$push: { comments: newComment },
+		});
 		res.status(201).json(newComment);
 	} catch (error) {
 		console.log("Error on POST one comment: ", error);
@@ -101,9 +123,9 @@ router.post("/:eventId/comments", async (req, res) => {
 router.delete("/:eventId/comments/:commentId", async (req, res) => {
 	try {
 		await Comment.findByIdAndDelete(req.params.commentId);
-		res.status(202).json({ message: "Event deleted" });
+		res.status(202).json({ message: "Comment deleted" });
 	} catch (error) {
-		console.log("Error on DELETE one event: ", error);
+		console.log("Error on DELETE one comment ", error);
 		res.status(500).json(error);
 	}
 });
