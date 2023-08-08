@@ -42,8 +42,9 @@ router.post("/", async (req, res) => {
 });
 
 /* PUT one event (update) */
-router.put("/:eventId"),
-  async (req, res) => {
+router.put("/update/:eventId", async (req, res) => {
+  console.log(req.params.eventId);
+  try {
     const payload = req.body;
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.eventId,
@@ -51,12 +52,11 @@ router.put("/:eventId"),
       { new: true }
     );
     res.status(202).json(updatedEvent);
-    try {
-    } catch (error) {
-      console.log("Error on PUT one event: ", error);
-      res.status(500).json(error);
-    }
-  };
+  } catch (error) {
+    console.log("Error on PUT one event: ", error);
+    res.status(500).json(error);
+  }
+});
 
 /* DELETE one event (delete) */
 router.delete("/:eventId", async (req, res) => {
