@@ -31,7 +31,7 @@ const eventSchema = new Schema(
 				"The Shire",
 			],
 		},
-		userId: [{ type: Schema.Types.ObjectId, ref: "User" }],
+		userId: { type: Schema.Types.ObjectId, ref: "User" },
 		comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
 	},
 	{

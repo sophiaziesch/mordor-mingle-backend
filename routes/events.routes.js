@@ -23,7 +23,9 @@ router.get("/", async (req, res) => {
 /* GET one event (read) */
 router.get("/:eventId", async (req, res) => {
 	try {
-		const event = await Event.findById(req.params.eventId).populate("comments");
+		const event = await Event.findById(req.params.eventId)
+			.populate("userId")
+			.populate("comments");
 		console.log(event);
 		if (!event) {
 			return res.status(404).json({ message: "Event not found" });
@@ -39,22 +41,27 @@ router.get("/:eventId", async (req, res) => {
 router.post("/", async (req, res) => {
 	try {
 		const payload = req.body;
-		const userId = req.payload.userId;
-		console.log("POST event payload: ", payload);
-		const newEvent = await Event.create({
-			title: payload.title,
-			description: payload.description,
-			date: payload.date,
-			location: payload.location,
-			userId: userId,
-		});
+		const newEvent = await Event.create(payload);
 		res.status(201).json(newEvent);
-		//console.log(newEvent);
+		console.log(newEvent);
 	} catch (error) {
 		console.log("Error on POST one event: ", error);
 		res.status(500).json(error);
 	}
 });
+// router.post("/", async (req, res) => {
+// 	try {
+// 		const payload = req.body;
+// 		const userId = req.payload.userId;
+// 		console.log("POST event payload: ", payload);
+// 		const newEvent = await Event.create(payload);
+// 		res.status(201).json(newEvent);
+// 		//console.log(newEvent);
+// 	} catch (error) {
+// 		console.log("Error on POST one event: ", error);
+// 		res.status(500).json(error);
+// 	}
+// });
 
 /* PUT one event (update) */
 router.put("/:eventId"),
