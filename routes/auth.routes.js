@@ -74,12 +74,13 @@ router.get("/verify", isAuthenticated, async (req, res, next) => {
 
 /* GET one user route */
 
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", isAuthenticated, async (req, res) => {
 	try {
 		const userId = req.params.userId;
 		const user = await User.findById(userId)
 			.populate('eventsCreated')
 			.populate('eventsLiked');
+			console.log("user populated with events?", user)
 
 		res.status(200).json(user);
 	} catch (error) {
