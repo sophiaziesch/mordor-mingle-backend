@@ -25,7 +25,13 @@ router.get("/:eventId", async (req, res) => {
 	try {
 		const event = await Event.findById(req.params.eventId)
 			.populate("userId")
-			.populate("comments");
+			.populate({
+				path: "comments",
+				populate: {
+					path: "user",
+					model: "User",
+				},
+			});
 		console.log(event);
 		if (!event) {
 			return res.status(404).json({ message: "Event not found" });
@@ -43,7 +49,7 @@ router.post("/", async (req, res) => {
 		const payload = req.body;
 		const newEvent = await Event.create(payload);
 		res.status(201).json(newEvent);
-		console.log(newEvent);
+		//console.log(newEvent);
 	} catch (error) {
 		console.log("Error on POST one event: ", error);
 		res.status(500).json(error);
@@ -93,29 +99,32 @@ router.delete("/:eventId", async (req, res) => {
 
 /* COMMENTS ROUTES */
 /* GET all comments */
-router.get("/:eventId/comments", async (req, res) => {
-	try {
-		const eventId = req.params.eventId;
-		const comments = await Comment.find({ event: eventId });
-		res.status(200).json(comments);
-	} catch (error) {
-		console.log("Error on GET all comments: ", error);
-		res.status(500).json(error);
-	}
-});
+// router.get("/:eventId/comments", async (req, res) => {
+// 	try {
+// 		const eventId = req.params.eventId;
+// 		const comments = await Comment.find({ event: eventId }).populate("user");
+// 		console.log(user);
+// 		//console.log(comments);
+// 		res.status(200).json(comments);
+// 	} catch (error) {
+// 		console.log("Error on GET all comments: ", error);
+// 		res.status(500).json(error);
+// 	}
+// });
 
 /* POST new comment */
+/* isAuthenticated checks if user is logged in and passes down userId */
 router.post("/:eventId", isAuthenticated, async (req, res) => {
 	try {
 		const eventId = req.params.eventId;
 		const payload = req.body;
 		const userId = req.payload.userId;
-		console.log(payload);
 		const newComment = await Comment.create({
 			text: payload.text,
 			event: eventId,
-			userId,
+			user: userId,
 		});
+		console.log(newComment);
 		const updatedEvent = await Event.findByIdAndUpdate(eventId, {
 			$push: { comments: newComment },
 		});
