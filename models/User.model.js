@@ -23,7 +23,7 @@ const userSchema = new Schema(
 		eventsLiked: [{ type: Schema.Types.ObjectId, ref: "Event" }],
 		profileImage: String,
 		race: {
-			type: [String],
+			type: String,
 			enum: [
 				"Dwarf",
 				"Elf",
