@@ -28,7 +28,7 @@ router.get("/:eventId", async (req, res) => {
 			.populate({
 				path: "comments",
 				populate: {
-					path: "user",
+					path: "userId",
 					model: "User",
 				},
 			});
