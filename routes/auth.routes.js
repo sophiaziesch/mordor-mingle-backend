@@ -72,7 +72,7 @@ router.get("/verify", isAuthenticated, async (req, res, next) => {
 	}
 });
 
-/* GET one user route */
+/* GET user profile route */
 
 router.get("/:userId", isAuthenticated, async (req, res) => {
 	try {
@@ -80,11 +80,13 @@ router.get("/:userId", isAuthenticated, async (req, res) => {
 		const user = await User.findById(userId)
 			.populate('eventsCreated')
 			.populate('eventsLiked');
-			console.log("user populated with events?", user)
-
+			console.log("population of events", user)
+			if (!user) {
+				return res.status(404).json({ message: "User not found" })
+			}
 		res.status(200).json(user);
 	} catch (error) {
-		console.log("Error on GET on event: ", error);
+		console.log("Error on GET one user: ", error);
 		res.status(500).json(error);
 	}
 });
@@ -103,5 +105,17 @@ router.put("/:userId", async (req, res) => {
 		res.status(500).json(error);
 	}
 });
+
+/* GET user events 
+router.get("/:userId/events", async (req, res) => {
+	try {
+		const userId = req.params.userId;
+		const events = await Event.find({ user: userId });
+		res.status(200).json(events);
+	} catch (error) {
+		console.log("Error on GET all events: ", error);
+		res.status(500).json(error);
+	}
+}); */
 
 module.exports = router;

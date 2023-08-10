@@ -17,7 +17,7 @@ const eventSchema = new Schema(
 			required: [true, "Date is required."],
 		},
 		location: {
-			type: [String],
+			type: String,
 			enum: [
 				"Edoras",
 				"Fangorn",
